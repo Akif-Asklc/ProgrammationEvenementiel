@@ -1,10 +1,12 @@
 import socket
-from random import randing
+
 # Configuration de l'adresse et du port
 host = '127.0.0.1'  # Adresse du serveur (localhost)
 port = 12345
 
-while True:
+running = True
+
+while running: #Boucle qui exécutera nos commandes jusqu'a l'arrêt
     # Création de la socket du client
     client_socket = socket.socket()
     client_socket.connect((host, port))
@@ -22,9 +24,10 @@ while True:
         print("Déconnexion du client.")
         client_socket.close()
         break
+
     elif message.lower() == "ARRET":
         print("Arrêt du serveur demandé par le client.")
         client_socket.close()
         break
 
-    client_socket.close()
+    client_socket.close() # COMMUUNICATION TERMINEE

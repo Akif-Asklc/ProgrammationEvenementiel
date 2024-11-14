@@ -1,7 +1,7 @@
 import socket
 
 # Configuration de l'adresse et du port
-host = '127.0.0.1'
+host = '127.0.0.1' # Adresse du serveur (localhost)
 port = 12345
 
 # Création de la socket du serveur
@@ -20,15 +20,18 @@ while True:
         message = conn.recv(1024).decode()
         if not message:
             break
-
-        print(f"Message reçu : {message}")
+        else:
+            print(f"Message reçu : {message}")
 
         # Vérification des messages spéciaux
-        if message.lower() == "bye":
+        # upper --> Mettre le mot en majuscule
+
+        if message.upper() == "BYE":
             print("Le client a demandé de se déconnecter.")
             conn.send("Déconnexion du client...".encode())
             break
-        elif message.lower() == "arret":
+
+        elif message.upper() == "ARRET":
             print("Le client a demandé l'arrêt du serveur.")
             conn.send("Arrêt du serveur...".encode())
             conn.close()
@@ -38,7 +41,3 @@ while True:
         # Envoi de la réponse au client
         reply = f"Message reçu : {message}"
         conn.send(reply.encode())
-
-    conn.close()
-    print("Client déconnecté.")
-
