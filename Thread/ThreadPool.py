@@ -1,6 +1,7 @@
 import time
 import concurrent.futures
 import requests
+
 img_urls = [
 'https://cdn.pixabay.com/photo/2016/04/04/14/12/monitor-1307227_1280.jpg',
 'https://cdn.pixabay.com/photo/2018/07/14/11/33/earth-3537401_1280.jpg',
@@ -8,7 +9,7 @@ img_urls = [
 ]
 def download_image(img_url):
     img_bytes = requests.get(img_url).content
-    img_name = img_url.split('/')[4]
+    img_name = img_url.split('/')[9]
     with open(img_name, 'wb') as img_file:
         img_file.write(img_bytes)
         print(f"{img_name} was downloaded")
