@@ -1,13 +1,9 @@
 import sys
-from PyQt5.QtWidgets import (
-    QApplication, QWidget, QLabel, QLineEdit, QVBoxLayout, QHBoxLayout, QComboBox, QPushButton, QMessageBox, QGridLayout
-)
-
+from PyQt5.QtWidgets import *
 
 class TemperatureConverter(QWidget):
     def __init__(self):
         super().__init__()
-
         self.initUI()
 
     def initUI(self):
@@ -28,6 +24,8 @@ class TemperatureConverter(QWidget):
         self.result_output.setReadOnly(True)
         self.label_result_unit = QLabel("K")  # Par défaut Kelvin
 
+        self.help = QPushButton("?")
+
         # Layout principal (GridLayout pour aligner les éléments)
         layout = QGridLayout()
 
@@ -45,11 +43,15 @@ class TemperatureConverter(QWidget):
         layout.addWidget(self.result_output, 2, 1)
         layout.addWidget(self.label_result_unit, 2, 2)
 
+        # Ligne 4 : HELP
+        layout.addWidget(self.help, 3,2)
+
         self.setLayout(layout)
 
         # Events
         self.combo_units.currentIndexChanged.connect(self.update_units)
         self.convert_button.clicked.connect(self.convert_temperature)
+        # self.help.clicked.connect(self.show())
 
     def update_units(self):
         """Met à jour les unités en fonction de la sélection dans la combobox."""
@@ -83,6 +85,10 @@ class TemperatureConverter(QWidget):
             self.result_output.setText(f"{result:.2f} {unit}")
         except ValueError:
             self.show_error("Veuillez entrer un nombre valide.")
+
+    def ouvrirFenetre(self):
+        self.setWindowTitle("Conversion de Température")
+        self.resize(200, 50)
 
     def show_error(self, message):
         """Affiche une boîte de dialogue en cas d'erreur."""
