@@ -1,106 +1,73 @@
 import sys
+from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
-
-class TemperatureConverter(QWidget):
+class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
-        self.initUI()
+        widget = QWidget()
+        self.setCentralWidget(widget) # ligne qui sert a centralisé la variable widget sur le self
 
-    def initUI(self):
-        self.setWindowTitle("Conversion de Température")
-        self.resize(350, 200)
+        self.temperature = QLabel("Température : ")
+        self.text = QLineEdit("") # Button Text
+        self.choix_unites = QLabel()  # Label pour affiché l'unité de mesure
 
-        # Widgets
-        self.label_temp = QLabel("Température :")
-        self.input_temp = QLineEdit()
-        self.label_unit = QLabel("°C")  # Par défaut Celsius
+        self.unites = QComboBox() # QComboBox sert à choisir entre K ou °C
+        self.unites.addItems(["Celsius --> Kelvin", "Kelvin --> Celsius"])
 
-        self.convert_button = QPushButton("Convertir")
-        self.combo_units = QComboBox()
-        self.combo_units.addItems(["°C → K", "K → °C"])
+        self.convertir = QPushButton("Convertir") # Button convertir
 
-        self.label_result_text = QLabel("Conversion :")
-        self.result_output = QLineEdit()
-        self.result_output.setReadOnly(True)
-        self.label_result_unit = QLabel("K")  # Par défaut Kelvin
+        self.resultat = QLabel()
 
-        self.help = QPushButton("?")
+        self.aide = QPushButton("?")  # Button OK
 
-        # Layout principal (GridLayout pour aligner les éléments)
-        layout = QGridLayout()
+        grid = QGridLayout() # Création d'une Layout
+        widget.setLayout(grid) # Ajouter les composants au grid layout
 
-        # Ligne 1 : Température d'entrée
-        layout.addWidget(self.label_temp, 0, 0)
-        layout.addWidget(self.input_temp, 0, 1)
-        layout.addWidget(self.label_unit, 0, 2)
+        grid.addWidget(self.temperature, 0, 1) # Label
+        grid.addWidget(self.text, 0, 2)  # Label
+        grid.addWidget(self.choix_unites, 0, 3)
+        grid.addWidget(self.convertir, 1, 0) #Bouton convertir
+        grid.addWidget(self.unites, 1, 1)  # Table
+        grid.addWidget(self.resultat, 2,0) # Résultat
+        grid.addWidget(self.aide, 3, 3)  # Bouton Aide
 
-        # Ligne 2 : Bouton Convertir et combobox
-        layout.addWidget(self.convert_button, 1, 1)
-        layout.addWidget(self.combo_units, 1, 2)
 
-        # Ligne 3 : Résultat de la conversion
-        layout.addWidget(self.label_result_text, 2, 0)
-        layout.addWidget(self.result_output, 2, 1)
-        layout.addWidget(self.label_result_unit, 2, 2)
+        self.convertir.clicked.connect(self.__actionConvertir) # Action OK
+        self.aide.clicked.connect(self.__actionQuit)  # Action Quit
 
-        # Ligne 4 : HELP
-        layout.addWidget(self.help, 3,2)
+        self.setWindowTitle("Une première fenêtre") #Nom de la fenetre
+        self.resize(350,200) # redimensionnement de la taille
 
-        self.setLayout(layout)
+    def __actionConvertir(self):
+        # Il faut récupérer la valeur qu'on a entrer
+        valeur_temperature = float(self.text.text()) # Float --> Mettre le texte en valeur décimale
 
-        # Events
-        self.combo_units.currentIndexChanged.connect(self.update_units)
-        self.convert_button.clicked.connect(self.convert_temperature)
-        # self.help.clicked.connect(self.show())
-
-    def update_units(self):
-        """Met à jour les unités en fonction de la sélection dans la combobox."""
-        if self.combo_units.currentText() == "°C → K":
-            self.label_unit.setText("°C")
-            self.label_result_unit.setText("K")
-        else:
-            self.label_unit.setText("K")
-            self.label_result_unit.setText("°C")
-
-    def convert_temperature(self):
         try:
-            # Récupérer la valeur entrée
-            input_value = float(self.input_temp.text())
-
-            # Conversion en fonction de l'unité choisie
-            if self.combo_units.currentText() == "°C → K":
-                if input_value < -273.15:
-                    self.show_error("La température en Celsius ne peut pas être inférieure à -273,15.")
+            if self.unites.currentTextChanged() == "Celsius --> Kelvin":  # Ici, CurrentText va chercher à savoir ? se trouve dans 'unites
+                self.choix_unites.setText("°C")  # Entrer °C
+                if valeur_temperature < -273.15:
+                    self.show_error("La température en Celsius ne peut pas être inférieure à -273,15K")
                     return
-                result = input_value + 273.15
-                unit = "°C"
-            else:
-                if input_value < 0:
-                    self.show_error("La température en Kelvin ne peut pas être inférieure à 0.")
-                    return
-                result = input_value - 273.15
-                unit = "K"
+                    resultat = valeur_temperature + 273.15
+                    unites = "K"
+            elif self.unites.currentTextChanged() == "Kelvin --> Celsius":
+                self.choix_unites.setText("K")
 
-            # Afficher le résultat
-            self.result_output.setText(f"{result:.2f} {unit}")
         except ValueError:
-            self.show_error("Veuillez entrer un nombre valide.")
+            raise "Il y a eu une erreur dans votre saisie."
+    def __actionQuit(self):
+        QCoreApplication.exit(0)
 
-    def ouvrirFenetre(self):
-        self.setWindowTitle("Conversion de Température")
-        self.resize(200, 50)
+    # Fonction qui affichera les erreurs
+    def erreur(self, message):
+        erreur = QMessageBox()
+        erreur.setIcon(QMessageBox.Warning)
+        erreur.setText(message)
+        erreur.setWindowTitle("Erreur")
+        erreur.exec_()
 
-    def show_error(self, message):
-        """Affiche une boîte de dialogue en cas d'erreur."""
-        error_dialog = QMessageBox()
-        error_dialog.setIcon(QMessageBox.Warning)
-        error_dialog.setText(message)
-        error_dialog.setWindowTitle("Erreur")
-        error_dialog.exec_()
-
-
-if __name__ == "__main__":
+if __name__ == '__main__':
     app = QApplication(sys.argv)
-    converter = TemperatureConverter()
-    converter.show()
-    sys.exit(app.exec_())
+    window = MainWindow()
+    window.show() # Execution de la fenetre
+    app.exec()

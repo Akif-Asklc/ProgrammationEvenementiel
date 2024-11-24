@@ -3,7 +3,6 @@ from PyQt5.QtWidgets import (
     QApplication, QWidget, QLabel, QLineEdit, QVBoxLayout, QComboBox, QPushButton, QMessageBox
 )
 
-
 class TemperatureConverter(QWidget):
     def __init__(self):
         super().__init__()
