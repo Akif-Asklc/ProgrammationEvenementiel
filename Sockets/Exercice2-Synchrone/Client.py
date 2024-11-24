@@ -1,38 +1,26 @@
+from threading import Thread
 import socket
 
-# Configuration de l'adresse et du port
-host = '127.0.0.1'  # Adresse du serveur (localhost)
-port = 12345
+def Envoie(socket): # Fonction d'envoie de message
+    while True:
+        msg = input("Ton message : ") # Message
+        msg = msg.encode("utf-8") # Encode
+        socket.send(msg) # Envoie
+def Reception(socket): # Fonction de réception
+    while True:
+        requete_serveur = socket.recv(500) # Réception
+        requete_serveur = requete_serveur.decode('utf-8')
+        print(f"Client : {requete_serveur}")
 
-running = True
+Host = "127.0.0.1"
+Port = 6390
 
-# Création de la socket du client
-client_socket = socket.socket()
-client_socket.connect((host, port))
+#Création du socket
+socket = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
+socket.connect((Host,Port))
 
-while running: #Boucle qui exécutera nos commandes jusqu'a l'arrêt
+envoi = Thread(target=Envoie,args=[socket])
+recep = Thread(target=Reception,args=[socket])
 
-    # Lecture de l'entrée utilisateur
-    message = input("Entrez votre message (BYE pour quitter, ARRET pour arrêter le serveur) : ")
-    # Message
-    client_socket.send(message.encode())
-
-    # Réception de la réponse du serveur
-    reply = client_socket.recv(1024).decode()
-    print(f"Réponse du serveur : {reply}")
-    try:
-        # Vérification des commandes spéciales
-        if message.upper() == "BYE":
-            print("Déconnexion du client.")
-            client_socket.close()
-            break
-
-        elif message.upper() == "ARRET":
-            print("Arrêt du serveur demandé par le client.")
-            client_socket.close()
-            break
-    except KeyboardInterrupt: #CTRL+C
-        print("Programme arrêté par le serveur.")
-
-# Quand j'ai fini l'échange de message
-client_socket.close() # COMMUUNICATION TERMINEE
+envoi.start()
+recep.start()
