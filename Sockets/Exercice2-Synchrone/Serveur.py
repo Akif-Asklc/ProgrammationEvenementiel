@@ -19,7 +19,7 @@ Host = "127.0.0.1"
 Port = 6390
 
 #Création du socket
-socket = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
+socket = socket.socket()
 
 socket.bind((Host,Port))
 socket.listen(1)
